@@ -24,7 +24,7 @@ def PushtoRecent(NAME,MD5,URL):
 
 def index(request):
     context = {'version': settings.MOBSF_VER}
-    template="index.html"
+    template="index_base.html"
     return render(request,template,context)
 
 def handle_uploaded_file(f,typ):

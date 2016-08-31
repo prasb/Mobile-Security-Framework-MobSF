@@ -18,7 +18,8 @@ urlpatterns = [
     url(r'^register/success/$', register_success),
     url(r'^home/$', home),
     
-    url(r'^$',MobSF.views.index),
+     url(r'^login/',MobSF.views.index),
+  #  url(r'^login/',MobSF.views.index),
     url(r'^Upload/$', MobSF.views.Upload),
     url(r'^download/', MobSF.views.Download),
     url(r'^about/$', MobSF.views.about),
