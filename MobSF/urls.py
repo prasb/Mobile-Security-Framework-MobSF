@@ -6,9 +6,18 @@ import DynamicAnalyzer.views.android_standalone
 import StaticAnalyzer.views.android
 import StaticAnalyzer.views.ios
 import StaticAnalyzer.views.shared_func
+from login.views import *
 
 urlpatterns = [
     # Examples:
+    
+    url(r'^$', 'django.contrib.auth.views.login'),
+    url(r'^logout/$', logout_page),
+    url(r'^accounts/login/$', 'django.contrib.auth.views.login'), # If user is not login it will redirect to login page
+    url(r'^register/$', register),
+    url(r'^register/success/$', register_success),
+    url(r'^home/$', home),
+    
     url(r'^$',MobSF.views.index),
     url(r'^Upload/$', MobSF.views.Upload),
     url(r'^download/', MobSF.views.Download),

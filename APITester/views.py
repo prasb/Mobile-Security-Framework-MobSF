@@ -17,7 +17,7 @@ from urlparse import urlparse
 from cgi import parse_qs
 import tornado.httpclient
 import os,re,json,datetime,socket,string,urllib,pickle
-from lxml import etree
+#from lxml import etree
 
 
 @register.filter

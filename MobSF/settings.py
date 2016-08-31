@@ -141,6 +141,7 @@ INSTALLED_APPS = (
     'MobSF',
     'APITester',
     'MalwareAnalyzer',
+    'login'
 )
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
