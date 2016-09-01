@@ -37,19 +37,20 @@ def register_success(request):
     return render_to_response(
     'registration/success.html',
     )
- 
+
+
 def logout_page(request):
     logout(request)
     return HttpResponseRedirect('/')
  
-@login_required
+
 def home(request):
     return render_to_response(
     'home_login.html',
     { 'user': request.user }
     )
 
-@login_required
+
 def getformdetails(request):
     username = request.POST['username']
     password = request.POST['password']

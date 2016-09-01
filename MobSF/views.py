@@ -6,10 +6,12 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.encoding import smart_str
 from wsgiref.util import FileWrapper
+from django.contrib.auth.decorators import login_required
 
 from MobSF.utils import PrintException, filename_from_path
 from MobSF.models import RecentScansDB
 from .forms import UploadFileForm
+
 
 import os, hashlib, platform, json,shutil,re
 
@@ -29,6 +31,7 @@ def index(request):
     template="index_base.html"
     return render(request,template,context)
 
+
 def handle_uploaded_file(f,typ):
     md5 = hashlib.md5() #modify if crash for large
     for chunk in f.chunks():
@@ -41,6 +44,7 @@ def handle_uploaded_file(f,typ):
         for chunk in f.chunks():
             destination.write(chunk)
     return md5sum
+
 
 def Upload(request):
     try:
@@ -125,6 +129,7 @@ def NotFound(request):
     context = {'title':'Not Found'}
     template ="not_found.html"
     return render(request,template,context)
+
 
 def RecentScans(request):
     if request.user.is_authenticated():        
