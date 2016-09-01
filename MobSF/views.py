@@ -22,7 +22,9 @@ def PushtoRecent(NAME,MD5,URL):
     except:
         PrintException("[ERROR] Adding Scan URL to Database")
 
+@login_required
 def index(request):
+    
     context = {'version': settings.MOBSF_VER}
     template="index_base.html"
     return render(request,template,context)
@@ -42,58 +44,60 @@ def handle_uploaded_file(f,typ):
 
 def Upload(request):
     try:
-        response_data = {}
-        response_data['url'] = ''
-        response_data['description'] = ''
-        response_data['status'] = ''
-        if request.method == 'POST':
-            form = UploadFileForm(request.POST, request.FILES)
-            if form.is_valid():
-                file_type =request.FILES['file'].content_type
-                print "[INFO] MIME Type: " + file_type + " FILE: " + str(request.FILES['file'].name)
-                if (file_type in settings.APK_MIME) and request.FILES['file'].name.lower().endswith('.apk'):     #APK
-                    md5=handle_uploaded_file(request.FILES['file'],'.apk')
-                    response_data['url'] = 'StaticAnalyzer/?name='+request.FILES['file'].name+'&type=apk&checksum='+md5
-                    response_data['status'] = 'success'
-                    PushtoRecent(request.FILES['file'].name,md5,response_data['url'])
-                    print "\n[INFO] Performing Static Analysis of Android APK"
-                elif (file_type in settings.ZIP_MIME) and request.FILES['file'].name.lower().endswith('.zip'):   #Android /iOS Zipped Source
-                    md5=handle_uploaded_file(request.FILES['file'],'.zip')
-                    response_data['url'] = 'StaticAnalyzer/?name='+request.FILES['file'].name+'&type=zip&checksum='+md5
-                    response_data['status'] = 'success'
-                    PushtoRecent(request.FILES['file'].name,md5,response_data['url'])
-                    print "\n[INFO] Performing Static Analysis of Android/iOS Source Code"
-                elif (file_type in settings.IPA_MIME) and request.FILES['file'].name.lower().endswith('.ipa'):   #iOS Binary
-                    if platform.system()=="Darwin": # Check for Mac OS X
-                        md5=handle_uploaded_file(request.FILES['file'],'.ipa')
-                        response_data['url'] = 'StaticAnalyzer_iOS/?name='+request.FILES['file'].name+'&type=ipa&checksum='+md5
+        if request.user.is_authenticated():
+            print "user authenticated"
+            response_data = {}
+            response_data['url'] = ''
+            response_data['description'] = ''
+            response_data['status'] = ''
+            if request.method == 'POST':
+                form = UploadFileForm(request.POST, request.FILES)
+                if form.is_valid():
+                    file_type =request.FILES['file'].content_type
+                    print "[INFO] MIME Type: " + file_type + " FILE: " + str(request.FILES['file'].name)
+                    if (file_type in settings.APK_MIME) and request.FILES['file'].name.lower().endswith('.apk'):     #APK
+                        md5=handle_uploaded_file(request.FILES['file'],'.apk')
+                        response_data['url'] = 'StaticAnalyzer/?name='+request.FILES['file'].name+'&type=apk&checksum='+md5
                         response_data['status'] = 'success'
                         PushtoRecent(request.FILES['file'].name,md5,response_data['url'])
-                        print "\n[INFO] Performing Static Analysis of iOS IPA"
-                    else:
-                        response_data['url'] = 'MAC_ONLY/'
+                        print "\n[INFO] Performing Static Analysis of Android APK"
+                    elif (file_type in settings.ZIP_MIME) and request.FILES['file'].name.lower().endswith('.zip'):   #Android /iOS Zipped Source
+                        md5=handle_uploaded_file(request.FILES['file'],'.zip')
+                        response_data['url'] = 'StaticAnalyzer/?name='+request.FILES['file'].name+'&type=zip&checksum='+md5
                         response_data['status'] = 'success'
-                        print "\n[ERROR] Static Analysis of iOS IPA requires OSX"
+                        PushtoRecent(request.FILES['file'].name,md5,response_data['url'])
+                        print "\n[INFO] Performing Static Analysis of Android/iOS Source Code"
+                    elif (file_type in settings.IPA_MIME) and request.FILES['file'].name.lower().endswith('.ipa'):   #iOS Binary
+                        if platform.system()=="Darwin": # Check for Mac OS X
+                            md5=handle_uploaded_file(request.FILES['file'],'.ipa')
+                            response_data['url'] = 'StaticAnalyzer_iOS/?name='+request.FILES['file'].name+'&type=ipa&checksum='+md5
+                            response_data['status'] = 'success'
+                            PushtoRecent(request.FILES['file'].name,md5,response_data['url'])
+                            print "\n[INFO] Performing Static Analysis of iOS IPA"
+                        else:
+                            response_data['url'] = 'MAC_ONLY/'
+                            response_data['status'] = 'success'
+                            print "\n[ERROR] Static Analysis of iOS IPA requires OSX"
+                    else:
+                        response_data['url'] = ''
+                        response_data['description'] = 'File format not Supported!'
+                        response_data['status'] = 'error'
+                        print "\n[ERROR] File format not Supported!"
+    
                 else:
                     response_data['url'] = ''
-                    response_data['description'] = 'File format not Supported!'
+                    response_data['description'] = 'Invalid Form Data!'
                     response_data['status'] = 'error'
-                    print "\n[ERROR] File format not Supported!"
-
+                    print "\n[ERROR] Invalid Form Data!"
             else:
                 response_data['url'] = ''
-                response_data['description'] = 'Invalid Form Data!'
+                response_data['description'] = 'Method not Supported!'
                 response_data['status'] = 'error'
-                print "\n[ERROR] Invalid Form Data!"
-        else:
-            response_data['url'] = ''
-            response_data['description'] = 'Method not Supported!'
-            response_data['status'] = 'error'
-            print "\n[ERROR] Method not Supported!"
-            form = UploadFileForm()
-        r= HttpResponse(json.dumps(response_data),content_type="application/json")
-        r['Access-Control-Allow-Origin']='*'
-        return r
+                print "\n[ERROR] Method not Supported!"
+                form = UploadFileForm()
+            r= HttpResponse(json.dumps(response_data),content_type="application/json")
+            r['Access-Control-Allow-Origin']='*'
+            return r
     except:
         PrintException("[ERROR] Uploading File:")
 
@@ -123,10 +127,11 @@ def NotFound(request):
     return render(request,template,context)
 
 def RecentScans(request):
-    DB=RecentScansDB.objects.all().order_by('-TS')
-    context = {'title': 'Recent Scans','entries': DB }
-    template="recent.html"
-    return render(request,template,context)
+    if request.user.is_authenticated():        
+        DB=RecentScansDB.objects.all().order_by('-TS')
+        context = {'title': 'Recent Scans','entries': DB }
+        template="recent.html"
+        return render(request,template,context)
 
 def Search(request):
     MD5=request.GET['md5']

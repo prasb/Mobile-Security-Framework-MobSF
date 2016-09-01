@@ -30,7 +30,8 @@ utils.printMobSFverison(MOBSF_VER, BANNER)
 #==============================================
 
 #==========MobSF Home Directory=================
-USE_HOME = False
+USE_HOME = True
+LOGIN_URL ='/'
 
 #True : All Uploads/Downloads will be stored in user's home directory
 #False : All Uploads/Downloads will be stored in MobSF root directory

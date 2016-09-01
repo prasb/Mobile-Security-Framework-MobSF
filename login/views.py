@@ -7,6 +7,9 @@ from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
+from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
+
  
 @csrf_protect
 def register(request):
@@ -45,5 +48,22 @@ def home(request):
     'home_login.html',
     { 'user': request.user }
     )
+
+@login_required
+def getformdetails(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    
+    print username
+    print password
+    
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        login(request, user)
+        print "user is logged"    
+    return render_to_response(
+     'home_login.html',
+    { 'user': request.user }
+    )   
 
 # Create your views here.

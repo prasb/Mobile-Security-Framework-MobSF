@@ -7,6 +7,7 @@ import StaticAnalyzer.views.android
 import StaticAnalyzer.views.ios
 import StaticAnalyzer.views.shared_func
 from login.views import *
+ 
 
 urlpatterns = [
     # Examples:
@@ -17,6 +18,7 @@ urlpatterns = [
     url(r'^register/$', register),
     url(r'^register/success/$', register_success),
     url(r'^home/$', home),
+    url(r'^x/$', getformdetails),
     
      url(r'^login/',MobSF.views.index),
   #  url(r'^login/',MobSF.views.index),
