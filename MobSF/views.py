@@ -45,7 +45,7 @@ def handle_uploaded_file(f,typ):
             destination.write(chunk)
     return md5sum
 
-
+@login_required
 def Upload(request):
     try:
         if request.user.is_authenticated():
@@ -105,32 +105,37 @@ def Upload(request):
     except:
         PrintException("[ERROR] Uploading File:")
 
+@login_required
 def about(request):
     context = {'title': 'About'}
     template="about.html"
     return render(request,template,context)
 
+@login_required
 def error(request):
     context = {'title':'Error'}
     template ="error.html"
     return render(request,template,context)
 
+@login_required
 def ZIP_FORMAT(request):
     context = {'title':'Zipped Source Instruction'}
     template ="zip.html"
     return render(request,template,context)
 
+@login_required
 def MAC_ONLY(request):
     context = {'title':'Supports OSX Only'}
     template ="ios.html"
     return render(request,template,context)
 
+@login_required
 def NotFound(request):
     context = {'title':'Not Found'}
     template ="not_found.html"
     return render(request,template,context)
 
-
+@login_required
 def RecentScans(request):
     if request.user.is_authenticated():        
         DB=RecentScansDB.objects.all().order_by('-TS')
@@ -138,6 +143,7 @@ def RecentScans(request):
         template="recent.html"
         return render(request,template,context)
 
+@login_required
 def Search(request):
     MD5=request.GET['md5']
     if re.match('[0-9a-f]{32}',MD5):
@@ -148,6 +154,7 @@ def Search(request):
             return HttpResponseRedirect('/NotFound')
     return HttpResponseRedirect('/error/')
 
+@login_required
 def Download(request):
     try:
         if request.method == 'GET':
