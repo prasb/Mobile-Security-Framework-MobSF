@@ -14,3 +14,5 @@
 
 # e.g. too many registers in a method, too many constant pool entries, code too long
 class ClassfileLimitExceeded(Exception): pass
+
+
